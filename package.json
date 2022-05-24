@@ -1,0 +1,24 @@
+{
+  "name": "sync-node-modules",
+  "version": "0.0.1",
+  "description": "Cross-checks your package-lock.json with your node_modules folder for mismatches and installs the correct packages if it finds any problems, like missing packages or incorrect versions",
+  "main": "index.js",
+  "repository": {
+    "url": "https://github.com/spiroszaf/sync-node-modules"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "node_modules",
+    "sync",
+    "auto",
+    "install",
+    "package.json",
+    "check",
+    "match",
+    "version"
+  ],
+  "author": "Spiros Zafrantsas",
+  "license": "MIT"
+}
