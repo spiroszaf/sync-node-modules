@@ -1,8 +1,9 @@
 {
   "name": "sync-node-modules",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Cross-checks your package-lock.json with your node_modules folder for mismatches and installs the correct packages if it finds any problems, like missing packages or incorrect versions",
   "main": "index.js",
+  "bin": "index.js",
   "repository": {
     "url": "https://github.com/spiroszaf/sync-node-modules"
   },

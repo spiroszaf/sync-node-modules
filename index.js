@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const fs = require('fs');
 const { exec } = require('child_process');
 
@@ -5,13 +7,22 @@ let installedModulesLock;
 let projectLock;
 const problems = [];
 
+function getArgValue(argName) {
+  const index = process.argv.indexOf(argName);
+  if (index == -1 || index == process.argv.length - 1)
+    return null;
+
+  return process.argv[index + 1]
+
+}
+
 const options = {
   debug: process.argv.includes('--debug'),
-  checkOnly: process.argv.includes('--check-only')
+  checkOnly: process.argv.includes('--check-only'),
+  customCommand: getArgValue('--command')
 };
 
 function checkModule(pkgPath) {
-  // console.debug(pkgPath);
   const pkg = projectLock.packages[pkgPath];
   const installedModule = installedModulesLock.packages[pkgPath];
 
@@ -43,12 +54,12 @@ function runCommand(cmd) {
   });
 }
 
-fs.readFile('./package-lock.json', (err, projectLockBuf) => {
+fs.readFile(process.cwd() + '/package-lock.json', (err, projectLockBuf) => {
   if (err) { throw err; }
 
   projectLock = JSON.parse(projectLockBuf.toString('utf8'));
 
-  fs.readFile('./node_modules/.package-lock.json', (err2, modulesLockBuf) => {
+  fs.readFile(process.cwd() + '/node_modules/.package-lock.json', (err2, modulesLockBuf) => {
     if (err) { throw err2; }
 
     installedModulesLock = JSON.parse(modulesLockBuf.toString('utf8'));
@@ -60,7 +71,7 @@ fs.readFile('./package-lock.json', (err, projectLockBuf) => {
 
       checkModule(installPath);
 
-      // Since we already check this package remove it so it won't be double-checked
+      // Since we already checked this package remove it so it won't be double-checked
       delete projectLock.packages[installPath];
     });
 
@@ -71,18 +82,24 @@ fs.readFile('./package-lock.json', (err, projectLockBuf) => {
       checkModule(pkgPath);
     });
 
+    console.error('')
+
     if (problems.length > 0) {
+
+      console.error('Problems found:')
       problems.forEach((problem) => console.error(problem));
+      console.error('')
 
       if (options.checkOnly) {
-        console.error('Not all packages are installed, or their versions is a match.');
+        console.error('Not all packages are installed, or their versions is a match.\n');
         process.exit(-1);
       } else {
-        console.error('Not all packages are installed, or their versions is a match. Installing...');
-        runCommand('npm install');
+        const command = options.customCommand || 'npm install'
+        console.error(`Not all packages are installed, or their versions is a match. Running \'${command}\'...\n`);
+        runCommand(command);
       }
     } else {
-      console.log('All packages are installed. No need to install anything.');
+      console.log('All packages are installed. No need to install anything.\n');
     }
   });
 });
